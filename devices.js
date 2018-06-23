@@ -423,6 +423,30 @@ const devices = [
         fromZigbee: generic.light_onoff_brightness_colortemp_colorxy().fromZigbee,
         toZigbee: generic.light_onoff_brightness_colortemp_colorxy().toZigbee,
     },
+    {
+        zigbeeModel: ['RWL020'],
+        model: '324131092621',
+        vendor: 'Philips',
+        description: 'Hue Dimmer Switch',
+        supports: 'TODO',
+        fromZigbee: [],
+        toZigbee: [],
+        configure: (ieeeAddr, shepherd, coordinator, callback) => {
+            const device = shepherd.find(ieeeAddr, 1);
+
+            if (device) {
+                device.bind('genOnOff', coordinator, (error) => {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        device.bind('genLevelCtrl', coordinator, (error) => {
+                            callback(error);
+                        });
+                    }
+                });
+            }
+        },
+    },
 
     // Belkin
     {
