@@ -737,6 +737,35 @@ const devices = [
         fromZigbee: generic.light_onoff_brightness_colortemp_colorxy().fromZigbee,
         toZigbee: generic.light_onoff_brightness_colortemp_colorxy().toZigbee,
     },
+
+    // Hampton Bay
+    {
+        zigbeeModel: ['HBUniversalCFRemote'],
+        model: '99432',
+        vendor: 'Hampton Bay',
+        description: 'Universal wink enabled white ceiling fan premier remote control',
+        supports: 'on/off',
+        fromZigbee: [],
+        toZigbee: [tz.onoff],
+        configure: (ieeeAddr, shepherd, coordinator, callback) => {
+            const cfgRptRec = {
+                direction: 0, attrId: 0, dataType: 16, minRepIntval: 0, maxRepIntval: 1000, repChange: 0,
+            };
+
+            const device = shepherd.find(ieeeAddr, 1);
+            if (device) {
+                device.bind('genOnOff', coordinator, (error) => {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        device.foundation('genOnOff', 'configReport', [cfgRptRec]).then((rsp) => {
+                            callback(rsp[0].status === 0);
+                        });
+                    }
+                });
+            }
+        },
+    },
 ];
 
 module.exports = devices;
